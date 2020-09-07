@@ -1,7 +1,7 @@
 # graph - adjacency version
 import copy as cp
 import glob
-import os
+import os, string
 
 def bfs(start, data):
 	adj = cp.deepcopy(data)
@@ -16,12 +16,19 @@ def bfs(start, data):
 				if not (visited[i] and adj[now][i] != 0):
 					continue
 			#print(now, adj[now][i], i)
-			sequence.append([now, i, adj[now][i]])
+			sequence.append([OH2chr(now-1), OH2chr(i-1), adj[now][i]]) #index 0 ~
 			adj[now][i] = 0
 			adj[i][now] = 0
 			queue += [i]
 			visited[i] = True
 	return sequence
+
+alpha = list(string.ascii_uppercase)
+chr2index = {i:alpha[i] for i in range(len(alpha))}
+
+def OH2chr(OH):
+    index = chr2index[OH]
+    return index
 
 
 # sort with maked time
@@ -42,7 +49,7 @@ for idx, folder in enumerate(folders):
     	#print(f)
         for i in range(1, len(data)):
             #print('start', i, bfs(i, data))
-            newF = open(os.getcwd() + '\\datasets\\seq' + str(idx+1) + '\\'+ basefile+"-"+str(i)+'.txt', 'w+')
+            newF = open(os.getcwd() + '\\datasets\\seq\\'+ str(idx) + basefile+"-"+str(i)+'.txt', 'w+')
             for seq in bfs(i, data):
                 newF.write(str(seq) + '\n')
             newF.close()
