@@ -35,6 +35,7 @@ for index in range(data_length):
     files = glob.glob(filename)
     print(files)
 '''
+
 files = glob.glob(dir)
 for file in files:
     datasets = []
@@ -45,4 +46,24 @@ for file in files:
         #datasets.append([chr2index[u[1]], chr2index[v[1]], float(w)])
     sequence_length.append(len(datasets))
     all_data.append(datasets)
+
+
 all_data = np.array([np.array(arr) for arr in all_data])
+
+max_sequence_length = max(sequence_length)
+zeros = np.zeros(53)
+     
+
+for ind, data in enumerate(all_data):
+    if len(data) != max_sequence_length:
+        for i in range(len(data), max_sequence_length):
+            all_data[ind] = np.vstack([all_data[ind], zeros])
+
+for data in all_data:
+    if len(data) != max_sequence_length:
+        print("false")        
+
+
+
+
+
