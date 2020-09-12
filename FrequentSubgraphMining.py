@@ -8,29 +8,67 @@ Created on Thu Sep 10 17:15:23 2020
 import numpy as np
 import glob, os
 import string
-
+from collections import defaultdict 
 
 dir = '.\\datasets\\fsm\\*'
 
-alpha = list(string.ascii_uppercase)
-chr2index = {alpha[i]:i for i in range(len(alpha))}
+def readRepresentGraph():
+    files = glob.glob(os.getcwd() + dir)
+    all_graph = []
+    for file in files:
+        adMatrix = []
+        with open(file, 'r') as f:
+            for line in f: 
+                l = []
+                for num in line.split(' '):
+                    if num.isdigit(): 
+                        l.append(int(num))
+                    else:
+                        if num != '\n':
+                            l.append(float(num))
+                adMatrix.append(l)
+    
+        del adMatrix[0]
+        
+        for index, line in enumerate(adMatrix):
+            for ind, val in enumerate(line):
+                if ind == 0:
+                    del line[ind]
 
-def chr2OH(alphabet):
-    index = chr2index[alphabet]
-    return index
+        all_graph.append(adMatrix)     
+        
+    
+    return all_graph
 
-all_names = []
-all_data = []
-sequence_length = []
-data_length = len(glob.glob(dir))
+# converts from adjacency matrix to adjacency list 
+def convertAdjMatToAdjList(adjMats):
+    all_adjList = []
+    for adjMat in adjMats:       
+        adjList = defaultdict(list) 
+        for i in range(len(adjMat)): 
+            for j in range(len(adjMat[i])): 
+                           if adjMat[i][j] != 0: 
+                               adjList[i].append(j)
+        all_adjList.append(adjList)
+    return all_adjList 
 
-files = glob.glob(dir)
-print(files)
-for file in files:
-    datasets = []
-    all_names.append(file.split('\\')[-1].replace('.txt', ''))
-    for rf in open(file, 'r'):
-        (u, v, w) = rf[1:-2].split(', ')
-        datasets.append([chr2OH(u[1]), chr2OH(v[1]) , float(w)])
-    sequence_length.append(len(datasets))
-    all_data.append(datasets)
+def printAdjList(AdjList):
+    print("Adjacency List:") 
+    # print the adjacency list 
+    for i in AdjList: 
+        print(i, end ="") 
+        for j in AdjList[i]: 
+            print(" -> {}".format(j), end ="") 
+        print() 
+  
+if __name__ == "__main__":
+    all_graphs = readRepresentGraph()    
+    all_adjList = convertAdjMatToAdjList(all_graphs) 
+    
+
+    
+    
+    
+    
+    
+    
