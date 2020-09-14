@@ -10,10 +10,10 @@ import glob, os
 import string
 from collections import defaultdict 
 
-dir = '.\\datasets\\fsm\\*'
+dir = '.\\datasets\\fsm\\graph*'
 
 def readRepresentGraph():
-    files = glob.glob(os.getcwd() + dir)
+    files = glob.glob( dir)
     all_graph = []
     for file in files:
         adMatrix = []
@@ -34,7 +34,7 @@ def readRepresentGraph():
             for ind, val in enumerate(line):
                 if ind == 0:
                     del line[ind]
-
+                    
         all_graph.append(adMatrix)     
         
     
@@ -65,10 +65,25 @@ if __name__ == "__main__":
     all_graphs = readRepresentGraph()    
     all_adjList = convertAdjMatToAdjList(all_graphs) 
     
-
+    minsup = 2
     
+    # all frequent 1-subgraphs
+    F1 = []
+    edges_1 = []
+    for i in all_adjList[0]:
+        for j in all_adjList[0][i]:
+            if j > i:
+                edges_1.append([j,i])
+            else:
+                edges_1.append([i,j])
+        
+    l2s = list(set(map(tuple,edges_1)))
+    for s in l2s:
+        if edges_1.count(list(s)) >= minsup:
+            F1.append(list(s))
     
-    
-    
+    #FSM
+    k = 2
+     
     
     
