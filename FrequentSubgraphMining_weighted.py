@@ -77,7 +77,7 @@ def printAdjList(AdjList):
         print() 
         
 def convertFntoDict(Fn, k):
-    Fn_flat = [e for sl in F2 for e in sl] 
+    Fn_flat = [e for sl in Fn for e in sl] 
     dup_Fn = list(set(map(tuple,Fn_flat)))
     edge2dict = {k: v for v, k in enumerate(dup_Fn)}
     FntoDict = []
@@ -91,26 +91,18 @@ def convertFntoDict(Fn, k):
 def reconstructCn(Cn, edge2dict):
     recons_Cn = []
     dup_Cn = []
-    print(edge2dict)
     for i in Cn:
-        print(i)
         dup_Cn.append(i[0].union(i[1]))
     dup_Cn = list(set(map(tuple,dup_Cn)))
-    print(dup_Cn)
     for j in dup_Cn:
         l = list(j)
-        print(l)
         tmp = []
         for i in l:
             for key, val in edge2dict.items():
-                print("i:", i)
                 if val == i:
-                    #print(i)
-                    #print(val)
-                    print("tmp: ", key)
+
                     tmp.append(key)
         recons_Cn.append(tmp) 
-    print(recons_Cn)
     return recons_Cn
 
 def generateCandidate(Fn, k):
@@ -138,8 +130,7 @@ def generateCandidate(Fn, k):
                 comp = set(Fn[j])
                 if fn_base.intersection(comp) != set():
                     Cn.append([fn_base, comp])
-                    
-        print("Cn: ", Cn)            
+                           
         Cn = reconstructCn(Cn, edge2dict)
     #Cn = list(set(map(tuple,candid)))      
     return Cn
@@ -204,15 +195,7 @@ if __name__ == "__main__":
     
     # all frequent 1-subgraphs
     F1 = countAllF1Subgraph(all_adjList, minsup)
-    k = 2
-    C2 = generateCandidate(F1, k)
-    F2 = countCandidate(C2, k)
-    
-    k = 3
-    C3 = generateCandidate(F2, k) 
-    F3 = countCandidate(C3, k)
-    
-    '''
+
     # FSM
     k = 2
     while globals()['F%s' % (k-1)] != []:
@@ -220,5 +203,4 @@ if __name__ == "__main__":
         globals()['F%s' % k] = countCandidate(globals()['C%s' % k], k)
         k = k + 1
     print(globals()['F%s' % (k-2)])
-    '''
   
