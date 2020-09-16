@@ -46,8 +46,7 @@ for file in files:
         #datasets.append([chr2index[u[1]], chr2index[v[1]], float(w)])
     sequence_length.append(len(datasets))
     all_data.append(datasets)
-
-
+ 
 all_data = np.array([np.array(arr) for arr in all_data])
 
 max_sequence_length = max(sequence_length)

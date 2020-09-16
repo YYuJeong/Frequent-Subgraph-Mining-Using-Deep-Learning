@@ -53,7 +53,8 @@ class Graph(object):
             ind = ind + chr(ord('A') + i) + ' '
             ind0 = ind0 + '0 '
         
-        filename = "\\datasets\\group" + str(self.index+1) + "\\represent" + str(self.index) + '.txt'
+        #filename = "\\datasets\\group" + str(self.index+1) + "\\represent" + str(self.index) + '.txt'
+        filename = "\\datasets\\fsm\\graph" +  str(self.index) + '.txt'
         path = os.getcwd() + filename
     
         f = open(path, 'w')

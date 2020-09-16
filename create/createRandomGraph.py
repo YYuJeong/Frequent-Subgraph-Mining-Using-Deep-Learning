@@ -9,7 +9,7 @@ import random
 
 def readRepresentGraph():
     path = os.getcwd()
-    files = path + '\\datasets\\represent\\represent3.txt'
+    files = path + '\\datasets\\fsm\\graph2.txt'
     print(files)  
     adMatrix = []
     with open(files, 'r') as f:
@@ -59,9 +59,9 @@ class Graph(object):
             ind = ind + chr(ord('A') + i) + ' '
             ind0 = ind0 + '0 '
         
-        filename = "\\datasets\\group11" + "\\graph" + str(self.index) + '.txt'
+        filename = "\\datasets\\fsm\\random" + "\\2graph" + str(self.index) + '.txt'
         path = os.getcwd() + filename
-    
+     
         f = open(path, 'w')
         for row in self.adjMatrix:
             line = ''
@@ -75,7 +75,8 @@ class Graph(object):
 def createRandomGraph(rangeN):
     for i in range(100):
         if rangeN == 1:     # weight range 0-10
-            sumVal = random.randint(0, 5)
+            #sumVal = random.randint(0, 5)
+            sumVal = 0
         elif rangeN == 2:    # weight range 30-50
             sumVal = random.randint(30, 50)
         elif rangeN == 3:    # weight range 80-100
@@ -85,7 +86,8 @@ def createRandomGraph(rangeN):
         for row in range(len(originMat)):
             for val in range(row):
                 if originMat[row][val] != 0:
-                    randG.add_edge(row, val, sumVal+round(originMat[row][val]*random.uniform(0, 1), 3))
+                    #randG.add_edge(row, val, sumVal+round(originMat[row][val]*random.uniform(0, 1), 3))
+                    randG.add_edge(row, val, round((originMat[row][val]+random.uniform(0, 1)), 4))
         #        if val == randEdge:
         #            break
         randG.writeFile()
