@@ -15,7 +15,11 @@ Created on Fri Sep  4 14:13:49 2020
 import numpy as np
 import glob, os
 import string
-dir = '.\\datasets\\seq\\*'
+from pathlib import Path
+
+
+path = str(Path(__file__).parent.parent) 
+dir = path + '\\datasets\\structure_fsm\\seq\\*'
 
 alpha = list(string.ascii_uppercase)
 chr2index = {alpha[i]:i for i in range(len(alpha))}

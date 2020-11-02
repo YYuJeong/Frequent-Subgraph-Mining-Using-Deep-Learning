@@ -6,10 +6,11 @@ Created on Tue Sep  1 16:35:40 2020
 """
 import os 
 import random
+from pathlib import Path
 
 def readRepresentGraph():
-    path = os.getcwd()
-    files = path + '\\datasets\\fsm\\graph2.txt'
+    path = str(Path(__file__).parent.parent) 
+    files = path + '\\datasets\\structure_fsm\\rep2.txt'
     print(files)  
     adMatrix = []
     with open(files, 'r') as f:
@@ -59,8 +60,8 @@ class Graph(object):
             ind = ind + chr(ord('A') + i) + ' '
             ind0 = ind0 + '0 '
         
-        filename = "\\datasets\\fsm\\random" + "\\2graph" + str(self.index) + '.txt'
-        path = os.getcwd() + filename
+        filename = "\\datasets\\structure_fsm\\random" + "\\2graph" + str(self.index) + '.txt'
+        path =  str(Path(__file__).parent.parent) + filename
      
         f = open(path, 'w')
         for row in self.adjMatrix:

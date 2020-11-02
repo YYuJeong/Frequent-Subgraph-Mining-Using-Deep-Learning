@@ -10,6 +10,7 @@ Created on Tue Sep  1 10:51:19 2020
 import os 
 import copy, random
 import string
+from pathlib import Path
 
 class Graph(object):
 
@@ -54,9 +55,9 @@ class Graph(object):
             ind0 = ind0 + '0 '
         
         #filename = "\\datasets\\group" + str(self.index+1) + "\\represent" + str(self.index) + '.txt'
-        filename = "\\datasets\\fsm\\graph" +  str(self.index) + '.txt'
-        path = os.getcwd() + filename
-    
+        filename = "\\datasets\\structure_fsm\\rep" +  str(self.index) + '.txt'
+        path = str(Path(__file__).parent.parent) + filename
+        print(path)
         f = open(path, 'w')
         f.write(ind0+'\n')
         for row in self.adjMatrix:
