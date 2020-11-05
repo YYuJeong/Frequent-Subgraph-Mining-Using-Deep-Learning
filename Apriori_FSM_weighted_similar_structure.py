@@ -12,8 +12,9 @@ import string
 from collections import defaultdict 
 from itertools import combinations
 import numpy as np
-   
-dir = '..\\datasets\\structure_fsm\\rep*'
+import networkx as nx
+from networkx.algorithms import isomorphism
+dir = '.\\datasets\\structure_fsm\\rep*'
 
 def readRepresentGraph():
     files = glob.glob(dir)
@@ -182,20 +183,32 @@ def countAllF1Subgraph(all_adjList, minsup):
         
         if freq_count >= minsup:
             F1.append(comb)
-
+   
     return F1_new
+
+def checkGraphIsomorphism(g1, g2):
+    g1toNparray = np.array(g1)
+    g2toNparray = np.array(g2)
+    g1toNx = nx.from_numpy_matrix(g1toNparray)
+    g2toNx = nx.from_numpy_matrix(g2toNparray)
+    
+    isIsomorphic = isomorphism.GraphMatcher(g1toNx, g2toNx)
+    return isIsomorphic.is_isomorphic()
 
 all_graphs = readRepresentGraph()    
 all_adjList = convertAdjMatToAdjList(all_graphs) 
 all_adjList_weight = convertAdjMatToAdjList_weight(all_graphs)         
 
+
 if __name__ == "__main__":
     
     minsup = 2
+
     
     # all frequent 1-subgraphs
     F1 = countAllF1Subgraph(all_adjList, minsup)
-
+    print(F1)
+    '''
     # FSM
     k = 2
     while globals()['F%s' % (k-1)] != []:
@@ -203,4 +216,4 @@ if __name__ == "__main__":
         globals()['F%s' % k] = countCandidate(globals()['C%s' % k], k)
         k = k + 1
     print(globals()['F%s' % (k-2)])
-  
+    '''
