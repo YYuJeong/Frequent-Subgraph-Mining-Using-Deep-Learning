@@ -16,6 +16,16 @@ import networkx as nx
 from networkx.algorithms import isomorphism
 dir = '.\\datasets\\structure_fsm\\rep*'
 
+
+def checkGraphIsomorphism(g1, g2):
+    g1toNparray = np.array(g1)
+    g2toNparray = np.array(g2)
+    g1toNx = nx.from_numpy_matrix(g1toNparray)
+    g2toNx = nx.from_numpy_matrix(g2toNparray)
+    
+    isIsomorphic = isomorphism.GraphMatcher(g1toNx, g2toNx)
+    return isIsomorphic.is_isomorphic()
+
 def readRepresentGraph():
     files = glob.glob(dir)
     all_graph = []
@@ -161,8 +171,9 @@ def countAllF1Subgraph(all_adjList, minsup):
         vertex_len.append(len(g))
     max_vertex_len = max(vertex_len)
     ver_comb = [i for i in range(max_vertex_len)]
+    print(ver_comb)
     ver_comb = list(combinations(ver_comb, 2))
-
+    print(ver_comb)
     for comb in ver_comb:
         (u, v) = comb
         freq_count = 0
@@ -186,14 +197,6 @@ def countAllF1Subgraph(all_adjList, minsup):
    
     return F1_new
 
-def checkGraphIsomorphism(g1, g2):
-    g1toNparray = np.array(g1)
-    g2toNparray = np.array(g2)
-    g1toNx = nx.from_numpy_matrix(g1toNparray)
-    g2toNx = nx.from_numpy_matrix(g2toNparray)
-    
-    isIsomorphic = isomorphism.GraphMatcher(g1toNx, g2toNx)
-    return isIsomorphic.is_isomorphic()
 
 all_graphs = readRepresentGraph()    
 all_adjList = convertAdjMatToAdjList(all_graphs) 
@@ -207,8 +210,7 @@ if __name__ == "__main__":
     
     # all frequent 1-subgraphs
     F1 = countAllF1Subgraph(all_adjList, minsup)
-    print(F1)
-    '''
+
     # FSM
     k = 2
     while globals()['F%s' % (k-1)] != []:
@@ -216,4 +218,4 @@ if __name__ == "__main__":
         globals()['F%s' % k] = countCandidate(globals()['C%s' % k], k)
         k = k + 1
     print(globals()['F%s' % (k-2)])
-    '''
+    
