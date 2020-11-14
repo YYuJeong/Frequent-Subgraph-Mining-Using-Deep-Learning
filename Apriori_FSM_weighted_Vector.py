@@ -10,7 +10,6 @@ import glob, os
 import string
 from collections import defaultdict 
 from itertools import combinations, chain, groupby
-import numpy as np
 import networkx as nx
 import collections
 from networkx.algorithms import isomorphism
