@@ -32,11 +32,6 @@ for _ in range(15):
 
 precision = []    
 for ind, name in enumerate(namesbysize):
-    print(ind)
-    precision.append(len(predicts[ind])/len(namesbysize))
+    precision.extend(len(predicts[ind])/len(namesbysize))
     
-    
-'''    
-for ind, predict in enumerate(1, predicts):
-    print(ind+1)
-'''
+print('Best size in test case: ', max(precision) )
