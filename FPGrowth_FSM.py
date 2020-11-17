@@ -5,7 +5,17 @@ Created on Tue Oct 20 00:56:51 2020
 @author: YuJeong
 """
 import itertools
+import numpy as np
+import glob, os
+import string
+from collections import defaultdict 
+from itertools import combinations, chain, groupby
+import networkx as nx
+import collections
+from networkx.algorithms import isomorphism
+from scipy.spatial import distance
 
+dir = '.\\datasets\\structure_fsm\\rep*'
 
 class FPNode(object):
     """
@@ -83,7 +93,7 @@ class FPTree(object):
         for key in list(items.keys()):
             if items[key] < threshold:
                 del items[key]
-
+        #print(items)
         return items
 
     @staticmethod
@@ -283,20 +293,197 @@ def generate_association_rules(patterns, confidence_threshold):
 
     return rules
 
+
+def readRepresentGraph():
+    files = glob.glob(dir)
+    all_graph = []
+    for file in files:
+        adMatrix = []
+        with open(file, 'r') as f:
+            for line in f: 
+                l = []
+                for num in line.split(' '):
+                    if num.isdigit(): 
+                        l.append(int(num))
+                    else:
+                        if num != '\n':
+                            l.append(float(num))
+                adMatrix.append(l)
+    
+        del adMatrix[0]
+        
+        for index, line in enumerate(adMatrix):
+            for ind, val in enumerate(line):
+                if ind == 0:
+                    del line[ind]
+                    
+        all_graph.append(adMatrix)     
+        
+    
+    return all_graph
+
+
+# converts from adjacency matrix to adjacency list 
+def convertAdjMatToAdjList(adjMats):
+    all_adjList = []
+    for adjMat in adjMats:       
+        adjList = defaultdict(list) 
+        for i in range(len(adjMat)): 
+            for j in range(len(adjMat[i])): 
+               if adjMat[i][j] != 0: 
+                   adjList[i].append(j)
+        all_adjList.append(adjList)
+    return all_adjList 
+
+def convertAdjMatToAdjList_weight(adjMats):
+    all_adjList_weight = []
+    for adjMat in adjMats:       
+        adjList = defaultdict(list) 
+        for i in range(len(adjMat)): 
+            for j in range(len(adjMat[i])): 
+               if adjMat[i][j] != 0: 
+                   adjList[i].append((j,adjMat[i][j]))
+        all_adjList_weight.append(adjList)
+    return all_adjList_weight
+
+def printAdjList(AdjList):
+    print("Adjacency List:") 
+    # print the adjacency list 
+    for i in AdjList: 
+        print(i, end ="") 
+        for j in AdjList[i]: 
+            print(" -> {}".format(j), end ="") 
+        print() 
+        
+def findAllNodes(all_adjList_weight):
+    ## find all frequent 1-subgraphs
+    # all nodes in graph data set
+    nodesList = []
+    for adjList_weight in all_adjList_weight:
+        nodesList.append(list(adjList_weight.keys()))
+    nodesSet = list(set(chain.from_iterable(nodesList)))
+    return nodesSet
+
+def edgeTodic(nodesSet):
+    # edge based encoding
+    edge2dic = {}
+    edgepairs =list(combinations(nodesSet, 2))      
+    keys = range(len(edgepairs))
+    for i in keys:
+        edge2dic['e' + str(i)] = edgepairs[i]  
+    return edge2dic
+
+def EncodingGraphbyEdge(adjMat):      
+    graph = []
+    for i in range(len(adjMat)): 
+        for j in range(len(adjMat[i])): 
+           if adjMat[i][j] != 0: 
+               e = (i, j)
+               for var, edge in edge2dic.items():
+                    if edge == e:
+                        graph.append(var)  
+    return graph
+
+def findF0graphs():
+    # scan each node in graph data set
+    F0 = []
+    for node in nodesSet:
+        count = 0
+        for adjList in all_adjList_weight:
+            if node in adjList:
+                count = count + 1
+        if count >= minsup:
+            F0.append(node)
+    return F0
+
+def generateC1(F0):
+    ## generate C1 using F0
+    
+    C1 = list(combinations(F0, 2))
+    
+    candidE = []
+    for c1 in C1:
+        (u, v) = c1
+        edge0 = all_graphs[0][u][v]
+        if edge0 != 0: 
+            for ind, graph in enumerate(all_graphs[1:]):
+                if graph[u][v] != 0 and distance.euclidean(edge0, graph[u][v]) <= T:
+                    edge0 = (edge0 + graph[u][v])/ 2
+                else:
+                    if graph[u][v] != 0:
+                        candidE.append([u, v, graph[u][v]])
+            candidE.append([u, v, edge0])
+    C1 = candidE
+    C1todic = []
+    for c1 in C1:
+        (u, v, w) = c1
+        for var, edge in edge2dic.items():
+            if edge == (u, v):
+                C1todic.append([var, w])
+    return C1todic    
+
+def findF1(C1):
+    ## find F1 using C1 --> k = 1    
+    F1 = [] 
+    for c1 in C1:
+        (u, v) = edge2dic[c1[0]]
+        w = c1[1]
+        count = 0 
+        deledges = []
+        for ind, graph in enumerate(all_graphs):
+            if graph[u][v] != 0 and distance.euclidean(graph[u][v], w) <= T:
+                count = count + 1
+            elif graph[u][v] != 0 and distance.euclidean(graph[u][v], w) > T:
+                deledges.append([ind, c1[0]])
+        if count >= minsup:
+            F1.append([c1[0], w])
+    return F1, deledges
+
+
+all_graphs = readRepresentGraph()    
+all_adjList = convertAdjMatToAdjList(all_graphs) 
+all_adjList_weight = convertAdjMatToAdjList_weight(all_graphs)         
+
+nodesSet = findAllNodes(all_adjList_weight)
+edge2dic = edgeTodic(nodesSet)
+
+minsup = 3
+T = 0.5
+
 if __name__ == "__main__":
     
     
-    transactions = [[1, 2, 5],
-                [2, 4],
-                [2, 3],
-                [1, 2, 4],
-                [1, 3],
-                [2, 3],
-                [1, 3],
-                [1, 2, 3, 5],
-                [1, 2, 3]]
+    graphs2edge = []
+    for adjMat in all_graphs:   
+        graphs2edge.append(EncodingGraphbyEdge(adjMat))
     
-    patterns = find_frequent_patterns(transactions, 2)
+    F0 = findF0graphs()
+    C1 = generateC1(F0)
+    F1, deledges = findF1(C1)
+
+    freqgraphs = []
+    for edge in deledges:
+        (ind, e) = edge
+        graphs2edge[ind].remove(e)
     
+    graphs = []
+    for graph in graphs2edge:
+        g = []
+        for e in graph:
+            g.append(int(e[1:]))
+        graphs.append(g)
+    transactions = graphs
     
+    patterns = find_frequent_patterns(transactions, minsup)
+    freq = list(patterns.keys())
+    
+    freq2edge = []
+    for fsg in freq:
+        edge = []
+        for f in list(fsg):
+            edgename = 'e'+str(f)
+            for f1 in F1:
+                if f1[0] == edgename:
+                    edge.extend(f1)
+        freq2edge.append(edge)
     
